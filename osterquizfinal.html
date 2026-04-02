@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Familien-Osterquiz</title>
+  <style>
+    /* =========================================================
+       GRUNDLEGENDE EINSTELLUNGEN
+       Hier kannst du Farben, Schrift und Grundlayout anpassen.
+       ========================================================= */
+
+    :root {
+      --bg-sky: #dff3ff;
+      --bg-grass: #dff5d7;
+      --card-bg: rgba(255, 255, 255, 0.88);
+      --text-main: #24303f;
+      --text-soft: #5f6b78;
+      --accent: #f6b94c;
+      --accent-2: #f59bb7;
+      --green: #7acb86;
+      --green-dark: #4c9e63;
+      --shadow: 0 12px 30px rgba(34, 52, 70, 0.16);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(to bottom, var(--bg-sky), #eef9ff 30%, #fff7e8 100%);
+      color: var(--text-main);
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    .app {
+      max-width: 480px;
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 16px 14px 32px;
+      position: relative;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+    }
+
+    .section-pad {
+      padding: 20px;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .title {
+      font-size: 30px;
+      line-height: 1.12;
+      margin: 0;
+    }
+
+    .subtitle {
+      color: var(--text-soft);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .button {
+      width: 100%;
+      border: 0;
+      border-radius: 18px;
+      padding: 14px 16px;
+      background: linear-gradient(135deg, #ffd979, #f6b94c);
+      color: #3c2b12;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(246, 185, 76, 0.35);
+    }
+
+    .button.secondary {
+      background: #eef3f7;
+      color: var(--text-main);
+      box-shadow: none;
+    }
+
+    .button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .input {
+      width: 100%;
+      border: 1px solid #d9e2ea;
+      background: #fff;
+      border-radius: 18px;
+      padding: 14px 14px;
+      outline: none;
+    }
+
+    .small-note {
+      margin-top: 12px;
+      background: #f5f8fb;
+      color: var(--text-soft);
+      padding: 10px 12px;
+      border-radius: 16px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .hud {
+      position: fixed;
+      right: 12px;
+      top: 12px;
+      z-index: 40;
+      display: flex;
+      gap: 8px;
+    }
+
+    .hud-box {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      padding: 10px 12px;
+      box-shadow: var(--shadow);
+      min-width: 92px;
+    }
+
+    .hud-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-soft);
+      font-weight: bold;
+    }
+
+    .hud-value {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 2px;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #ffd4e6, #fff0c5 48%, #dff5d7);
+    }
+
+    .map-card {
+      position: relative;
+      height: 620px;
+      overflow: hidden;
+      background: linear-gradient(to bottom, #cfeeff 0%, #e7f8ff 28%, #dff5d7 60%, #c8ecba 100%);
+    }
+
+
+    /* =========================================================
+       HINTERGRUNDBILDER FÜR DIE WIESE
+       Hier kannst du eigene Bilder aus deinem Repo einfügen.
+       Lege die Dateien zum Beispiel in /images/ ab.
+
+       Beispiel:
+       background-image: url('images/wiese-bg.jpg');
+       ========================================================= */
+    .map-card.custom-bg {
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .cloud {
+      position: absolute;
+      background: rgba(255,255,255,0.78);
+      border-radius: 999px;
+      filter: blur(10px);
+    }
+
+    .hill {
+      position: absolute;
+      bottom: 0;
+      border-top-left-radius: 999px;
+      border-top-right-radius: 999px;
+    }
+
+    .hint-pill {
+      position: absolute;
+      left: 50%;
+      top: 18px;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.88);
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 12px;
+      box-shadow: var(--shadow);
+      z-index: 3;
+    }
+
+    .egg {
+      position: absolute;
+      width: 64px;
+      height: 84px;
+      border: 2px solid rgba(255,255,255,0.84);
+      border-radius: 45% 45% 48% 48% / 52% 52% 44% 44%;
+      cursor: pointer;
+      box-shadow: 0 10px 18px rgba(48, 76, 38, 0.18);
+      overflow: hidden;
+      background: linear-gradient(to bottom, #ffd5e2, #fff1ae 50%, #d6f4dd 100%);
+      z-index: 5;
+    }
+
+    .egg::before,
+    .egg::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      opacity: 0.8;
+    }
+
+    .egg::before {
+      top: 22%;
+      background: rgba(245, 137, 180, 0.7);
+      transform: rotate(-7deg);
+    }
+
+    .egg::after {
+      top: 52%;
+      background: rgba(132, 202, 255, 0.7);
+      transform: rotate(7deg);
+    }
+
+    .egg span {
+      position: absolute;
+      top: 67%;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background: rgba(246, 199, 86, 0.8);
+      transform: rotate(-5deg);
+    }
+
+    .egg.done {
+      background: #d5d9de;
+      border-color: #c3c9d0;
+      opacity: 0.68;
+      cursor: default;
+      filter: grayscale(1);
+    }
+
+    .map-header {
+      margin-bottom: 14px;
+      padding-right: 100px;
+    }
+
+    .leaderboard-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f5f8fb;
+      border-radius: 16px;
+      padding: 10px 12px;
+      gap: 10px;
+    }
+
+    .leaderboard-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .rank-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .leaderboard-name {
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .leaderboard-score {
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .quiz-image {
+  position: relative;
+  min-height: 180px;
+  background: #dbe9f2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+.quiz-image img {
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  object-fit: contain;
+}
+
+    .quiz-image-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.52), rgba(0,0,0,0.08));
+    }
+
+    .quiz-image-text {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 14px;
+      color: #fff;
+      z-index: 2;
+    }
+
+    .question-title {
+      margin: 0 0 6px;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0.86;
+    }
+
+    .question-count {
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .attempt-counter {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-soft);
+      margin: 6px 0 16px;
+    }
+
+    .question-text {
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1.45;
+      margin: 0 0 8px;
+    }
+
+    .answer-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .answer-btn {
+      width: 100%;
+      text-align: left;
+      padding: 14px 14px;
+      border: 1px solid #d9e2ea;
+      border-radius: 16px;
+      background: #fff;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .answer-btn.selected {
+      border-color: #f6b94c;
+      background: #fff6e0;
+    }
+
+    .answer-btn.correct {
+      border-color: #7acb86;
+      background: #ebfff0;
+    }
+
+    .answer-btn.wrong {
+      border-color: #e28ca1;
+      background: #fff0f4;
+    }
+
+    .lore-box,
+    .feedback-box {
+      margin-top: 14px;
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .lore-box {
+      background: #f5f8fb;
+    }
+
+    .feedback-retry {
+      background: #fff4d8;
+      color: #8a6413;
+    }
+
+    .feedback-correct {
+      background: #ebfff0;
+      color: #2a7941;
+    }
+
+    .feedback-reveal {
+      background: #fff0f4;
+      color: #9b4761;
+    }
+
+    .quiz-actions {
+      margin-top: 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .quiz-nav {
+      margin-top: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-soft);
+      font-size: 12px;
+    }
+
+    .link-button {
+      background: none;
+      border: 0;
+      padding: 0;
+      color: inherit;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .end-photo-placeholder {
+      height: 190px;
+      border: 2px dashed #cdd5dd;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 16px;
+      background: #f7fafc;
+      color: var(--text-soft);
+      line-height: 1.5;
+    }
+
+    .end-photo {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      border-radius: 24px;
+    }
+
+    .mt-14 {
+      margin-top: 56px;
+    }
+
+    .mt-16 {
+      margin-top: 16px;
+    }
+
+    .mb-14 {
+      margin-bottom: 14px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 420px) {
+      .title {
+        font-size: 27px;
+      }
+
+      .map-card {
+        height: 570px;
+      }
+
+      .egg {
+        width: 58px;
+        height: 78px;
+      }
+
+      .hud {
+        right: 8px;
+        top: 8px;
+      }
+
+      .hud-box {
+        min-width: 84px;
+        padding: 9px 10px;
+      }
+    }
+
+    .leaderboard-item.rank-1 {
+  background: rgba(255, 215, 0, 0.16);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+}
+
+.leaderboard-item.rank-2 {
+  background: rgba(192, 192, 192, 0.18);
+  border: 1px solid rgba(160, 160, 160, 0.45);
+}
+
+.leaderboard-item.rank-3 {
+  background: rgba(205, 127, 50, 0.16);
+  border: 1px solid rgba(170, 102, 34, 0.45);
+}
+
+.rank-badge.rank-1 {
+  background: linear-gradient(135deg, #ffe58a, #d4af37);
+  color: #4d3b00;
+}
+
+.rank-badge.rank-2 {
+  background: linear-gradient(135deg, #f1f1f1, #a9a9a9);
+  color: #2f2f2f;
+}
+
+.rank-badge.rank-3 {
+  background: linear-gradient(135deg, #e4b07a, #aa6633);
+  color: #3e2412;
+}
+
+.confetti-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.confetti-piece {
+  position: fixed;
+  top: -20px;
+  width: 10px;
+  height: 16px;
+  opacity: 0.95;
+  animation: confetti-fall linear forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translate3d(0, -10vh, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate3d(var(--drift), 110vh, 0) rotate(720deg);
+  }
+}
+  </style>
+</head>
+<body>
+  <div class="app">
+<div id="confetti-layer" class="confetti-layer"></div>
+    <!-- ======================================================
+         FIXE ANZEIGE OBEN RECHTS
+         Zeigt Fortschritt und Punktzahl.
+         ====================================================== -->
+    <div id="hud" class="hud hidden">
+      <div class="hud-box">
+        <div class="hud-label">Gefundene Eier</div>
+        <div id="hud-eggs" class="hud-value">0/10</div>
+      </div>
+      <div class="hud-box">
+        <div class="hud-label">Punkte</div>
+        <div id="hud-score" class="hud-value">0</div>
+      </div>
+    </div>
+
+    <!-- ======================================================
+         STARTSCREEN
+         Hier kannst du Titel und Begrüßung anpassen.
+         ====================================================== -->
+    <section id="screen-start" class="screen active">
+      <div style="display:flex; min-height:90vh; align-items:center;">
+        <div class="card hero" style="width:100%;">
+          <div class="section-pad">
+            <div class="eyebrow">Familien-Osterquiz</div>
+            <h1 class="title">Das goldene Osternest</h1>
+            <p class="subtitle">
+              Suche die bunten Eier auf der Wiese, beantworte 10 Familienfragen und sammle möglichst viele Punkte.
+            </p>
+
+            <div class="card mt-16" style="background:rgba(255,255,255,0.75); box-shadow:none;">
+              <div class="section-pad">
+                <label for="name-input" style="display:block; margin-bottom:8px; font-weight:bold;">Dein Name</label>
+                <input id="name-input" class="input" type="text" placeholder="Zum Beispiel Oma, Opa oder Anna" />
+                <div class="small-note">
+  Der Name wird für diese Runde bestätigt und später in die lokale Rangliste auf diesem Gerät eingetragen.
+</div>
+
+<div class="small-note" style="margin-top:10px;">
+  <strong>Spielregeln</strong><br>
+  Finde alle 10 Ostereier auf der Wiese und beantworte die Fragen.<br>
+  Richtige Antwort im ersten Versuch: 10 Punkte.<br>
+  Richtige Antwort im zweiten Versuch: 5 Punkte.<br>
+  Nach zwei falschen Antworten wird die Lösung gezeigt und es gibt 0 Punkte.<br>
+  Wer am Ende die höchste Punktzahl hat, gewinnt eine kleine Osterüberraschung.
+</div>
+
+<button id="confirm-name-btn" class="button mt-16">Name bestätigen</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================
+         KARTENANSICHT / WIESE
+         Hier liegen die 10 Eier. Die Positionen kommen aus JS.
+         Wenn du EIN EIGENES HINTERGRUNDBILD willst, ändere das
+         unten im JavaScript unter APP_CONFIG.mapBackgroundImage.
+         ====================================================== -->
+    <section id="screen-map" class="screen">
+      <div class="card hero mb-14">
+        <div class="section-pad map-header">
+          <div class="eyebrow">Willkommen</div>
+          <h2 id="welcome-name" style="font-size:28px; margin:0;">Hallo</h2>
+          <p class="subtitle" style="margin-bottom:0;">
+            Tippe auf ein buntes Ei in der Osterwiese. Bereits beantwortete Eier werden grau.
+          </p>
+        </div>
+      </div>
+
+      <div id="map-card" class="card map-card">
+        <div class="cloud" style="left:-4%; top:13%; width:130px; height:70px;"></div>
+        <div class="cloud" style="right:6%; top:10%; width:150px; height:72px;"></div>
+
+        <div class="hill" style="left:-12%; width:200px; height:180px; background:rgba(90, 187, 104, 0.48);"></div>
+        <div class="hill" style="left:22%; width:280px; height:220px; background:rgba(158, 222, 119, 0.55);"></div>
+        <div class="hill" style="right:-14%; width:240px; height:190px; background:rgba(64, 165, 92, 0.43);"></div>
+
+        <div class="hint-pill">Tippe auf ein Ei in der Wiese</div>
+
+        <!-- Die Eier werden per JavaScript erzeugt -->
+        <div id="egg-layer"></div>
+      </div>
+
+      <div class="mt-16">
+  <button id="toggle-leaderboard-btn" class="button secondary">Rangliste anzeigen</button>
+</div>
+
+<div id="leaderboard-panel" class="card mt-16 hidden">
+  <div class="section-pad">
+    <div style="font-weight:bold; font-size:18px; margin-bottom:12px;">Lokale Rangliste auf diesem Gerät</div>
+    <div id="leaderboard-list" class="leaderboard-list"></div>
+  </div>
+</div>
+    </section>
+
+    <!-- ======================================================
+         FRAGENANSICHT
+         Hier erscheint je nach ausgewähltem Ei eine Frage.
+         Das Bild über der Frage kommt aus question.image.
+         ====================================================== -->
+    <section id="screen-quiz" class="screen">
+      <div class="mt-14">
+        <div class="card">
+          <div class="quiz-image">
+            <!-- ==================================================
+                 BILD ÜBER DER FRAGE
+                 Dieses Bild wird automatisch aus den Fragedaten geladen.
+                 Du trägst die Bildpfade im QUIZ_DATA ein.
+                 Beispiel: image: 'images/frage1.jpg'
+                 ================================================== -->
+            <img id="quiz-image" src="" alt="Fragebild" />
+            <div class="quiz-image-overlay"></div>
+            <div class="quiz-image-text">
+              <p id="quiz-egg-title" class="question-title"></p>
+              <p id="quiz-question-count" class="question-count"></p>
+            </div>
+          </div>
+
+          <div class="section-pad">
+            <p id="quiz-question-text" class="question-text"></p>
+            <div id="attempt-counter" class="attempt-counter"></div>
+
+            <div id="answer-list" class="answer-list"></div>
+
+            <div id="lore-box" class="lore-box hidden">
+  <strong id="lore-title">Auflösung</strong>
+  <div id="quiz-lore-text" style="margin-top:6px;"></div>
+</div>
+
+            <div id="feedback-box" class="feedback-box hidden"></div>
+
+            <div class="quiz-actions">
+              <button id="submit-answer-btn" class="button">Antwort prüfen</button>
+              <button id="next-from-quiz-btn" class="button secondary hidden">Nächstes Ei suchen</button>
+            </div>
+
+            <div class="quiz-nav">
+              <button id="back-to-map-btn" class="link-button">← Zur Wiese</button>
+              <span>Osterquiz</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================
+         ENDSCREEN
+         Hier kannst du später ein Familienfoto und Ostergruß einbauen.
+         Das Bild kommt aus APP_CONFIG.endPhoto.
+         ====================================================== -->
+    <section id="screen-end" class="screen">
+      <div style="display:flex; min-height:90vh; align-items:center; padding-top:40px;">
+        <div class="card hero" style="width:100%; text-align:center;">
+          <div class="section-pad">
+            <div class="eyebrow">Geschafft</div>
+            <h2 id="end-title" class="title" style="font-size:34px;">Frohe Ostern</h2>
+            <p class="subtitle">Du hast alle 10 Eier gefunden und das Quiz abgeschlossen.</p>
+
+            <div class="grid-2 mt-16">
+              <div class="card" style="background:rgba(255,255,255,0.78); box-shadow:none;">
+                <div class="section-pad" style="padding:16px;">
+                  <div class="hud-label" style="font-size:11px;">Gefundene Eier</div>
+                  <div id="end-eggs" style="font-size:28px; font-weight:bold; margin-top:4px;">10/10</div>
+                </div>
+              </div>
+              <div class="card" style="background:rgba(255,255,255,0.78); box-shadow:none;">
+                <div class="section-pad" style="padding:16px;">
+                  <div class="hud-label" style="font-size:11px;">Endpunktzahl</div>
+                  <div id="end-score" style="font-size:28px; font-weight:bold; margin-top:4px;">0</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card mt-16" style="background:rgba(255,255,255,0.78); box-shadow:none;">
+              <div class="section-pad">
+                <div style="font-weight:bold; margin-bottom:10px;">Ostergruß</div>
+
+                <!-- ==================================================
+                     FAMILIENFOTO AM ENDE
+                     Wenn APP_CONFIG.endPhoto gesetzt ist, wird das Bild gezeigt.
+                     Wenn leer, bleibt der Platzhalter sichtbar.
+                     ================================================== -->
+                <img id="end-photo" class="end-photo hidden" src="" alt="Familienfoto" />
+                <div id="end-photo-placeholder" class="end-photo-placeholder">
+                  Hier kannst du später euer Familienfoto und einen schönen Ostergruß einsetzen.
+                </div>
+
+                <!-- ==================================================
+                     TEXT FÜR DEN OSTERGRUSS
+                     Diesen Text kannst du weiter unten in APP_CONFIG.endGreeting ändern.
+                     ================================================== -->
+                <p id="end-greeting" class="subtitle" style="margin-top:14px; margin-bottom:0;"></p>
+              </div>
+            </div>
+<div class="card mt-16" style="background:rgba(255,255,255,0.78); box-shadow:none;">
+  <div class="section-pad">
+    <div style="font-weight:bold; font-size:18px; margin-bottom:12px;">Rangliste</div>
+    <div id="end-leaderboard-list" class="leaderboard-list"></div>
+  </div>
+</div>            <button id="restart-btn" class="button mt-16">Nochmal spielen</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    /* =========================================================
+       ZENTRALE KONFIGURATION
+       HIER TRÄGST DU DEINE EIGENEN INHALTE EIN.
+       Alles Wichtige ist an einer Stelle gesammelt.
+       ========================================================= */
+
+    const APP_CONFIG = {
+      totalQuestions: 10,
+
+      /* =======================================================
+         SPEICHERNAME FÜR DIE LOKALE RANGLISTE
+         Wenn du für die zweite Familienseite ein anderes Repo nutzt,
+         ändere diesen Key, damit die Ranglisten getrennt bleiben.
+         ======================================================= */
+      storageKey: "familien-osterquiz-local-leaderboard-v1",
+
+      /* =======================================================
+         OPTIONAL: HINTERGRUNDBILD FÜR DIE WIESE
+         Beispiel:
+         mapBackgroundImage: 'images/wiese-muetterlich.jpg'
+
+         Wenn leer, bleibt die eingebaute gezeichnete Wiese aktiv.
+         ======================================================= */
+mapBackgroundImage: "images/wiese.png",
+
+      /* =======================================================
+         OPTIONAL: FAMILIENFOTO AUF DEM ENDSCREEN
+         Beispiel:
+         endPhoto: 'images/familienfoto-ostern.jpg'
+         ======================================================= */
+      endPhoto: "",
+
+      /* =======================================================
+         OSTERGRUSS AUF DER ABSCHLUSSSEITE
+         ======================================================= */
+      endGreeting: "Frohe Ostern!",
+
+      /* =======================================================
+         HIER KOMMEN DEINE 10 FRAGEN REIN
+
+         So funktioniert jede Frage:
+         id: laufende Nummer
+         title: kleine Bezeichnung für das Ei
+         prompt: eigentliche Frage
+         options: genau 4 Antwortmöglichkeiten
+         answer: Index der richtigen Antwort
+                 0 = erste Antwort
+                 1 = zweite Antwort
+                 2 = dritte Antwort
+                 3 = vierte Antwort
+         lore: kleiner Insider, Erinnerung oder Zusatztext
+         image: Bildpfad für das Bild über der Frage
+
+         BILDER:
+         Wenn du im Repo einen Ordner /images/ hast, dann z. B.
+         image: 'images/frage1.jpg'
+         ======================================================= */
+      questions: [
+        {
+          id: 1,
+          title: "Wiesen-Ei 1",
+          prompt: "Wer würde am ehesten ein Osterei werfen und rufen „Osterhase, ich wähle dich!“?",
+          options: ["Onkel Hotti", "Phil", "Tim", "Susi"],
+          answer: 1,
+          lore: "Phil, weil ein Ei strenggenommen nur ein Saisonaler Pokéball ist.",
+          image: "images/frage1.png", 
+          solutionImage: "images/loesung1.png"
+        },
+        {
+          id: 2,
+          title: "Wiesen-Ei 2",
+          prompt: "Wer würde am ehesten Ostereier in Größe L, Kornblumenblau bestellen?",
+          options: ["Emma", "Opa Gerd", "Eli", "Annika"],
+          answer: 3,
+          lore: "Annika, weil bei ihr sogar Ostern nach Sammelbestellung bei Planam klingt.",
+          image: "images/frage2.png",
+                    solutionImage: "images/loesung2.png"
+
+        },
+        {
+          id: 3,
+          title: "Wiesen-Ei 3",
+          prompt: "Wessen Eier sind am weichsten?",
+          options: ["Oma Gittis", "Susis", "Elis", "Nells"],
+          answer: 0,
+          lore: "Oma Gittis, weil sie welche gehäkelt hat.",
+          image: "images/frage3.png",
+                    solutionImage: "images/loesung3.png"
+
+        },
+        {
+          id: 4,
+          title: "Wiesen-Ei 4",
+          prompt: "Wer würde dem Osterhasen erstmal eine Latzhose verkaufen, bevor die Eier verteilt werden?",
+          options: ["Oma Gitti", "Eli", "Nell", "Tim"],
+          answer: 3,
+          lore: "Tim, weil auch saisonale Feldtiere potenzielle Kunden sein können.",
+          image: "images/frage4.png",
+                    solutionImage: "images/loesung4.png"
+
+        },
+        {
+          id: 5,
+          title: "Wiesen-Ei 5",
+          prompt: "Wer merkt als Erster, dass der Osterhase ein ernstes Problem hat?",
+          options: ["Eli", "Emma", "Susi", "Oma Gitti"],
+          answer: 0,
+          lore: "Eli, weil dem Sozialarbeiter nach fünf Minuten klar war, dass der Hase zu viel Ostergras hatte.",
+          image: "images/frage5.png", 
+                    solutionImage: "images/loesung5.png"
+
+        },
+        {
+          id: 6,
+          title: "Wiesen-Ei 6",
+          prompt: "Wer kommt auf dich zu, sagt „ich hab noch einen“, und haut dann raus: „Eigentlich ist der Osterhase wie DHL. Die Lieferung ist irgendwo da, keiner weiß genau wo, und suchen darfst du am Ende selbst.“?",
+          options: ["Fred", "Onkel Hotti", "Opa Gerd", "Susi"],
+          answer: 1,
+          lore: "Onkel Hotti, weil… das sollte wohl klar sein!",
+          image: "images/frage6.png",
+                    solutionImage: "images/loesung6.png"
+
+        },
+        {
+          id: 7,
+          title: "Wiesen-Ei 7",
+          prompt: "Wer würde aus der Eiersuche am ehesten etwas machen, das am Ende fast wie eine kleine Studie aussieht?",
+          options: ["Opa Gerd", "Phil", "Nell", "Annika"],
+          answer: 2,
+          lore: "Nell, weil Suchen, Finden und Vergleichen am Besten systematisch gemacht wird!"    ,  
+          image: "images/frage7.png",
+                    solutionImage: "images/loesung7.png"
+        },
+        {
+          id: 8,
+          title: "Wiesen-Ei 8",
+          prompt: "Wie verlaufen unsere Familientreffen meistens?",
+          options: ["Chrisi spielt Gitarre im Hintergrund", "Emma und Phil zocken Nintendo", "Hotti macht einen flachen Witz", "Alles davon"],
+          answer: 3,
+          lore: "Und wir würden es nicht anders haben wollen.",
+          image: "images/frage8.png",
+          solutionImage: "images/loesung8.png"
+        },
+        {
+          id: 9,
+          title: "Wiesen-Ei 9",
+          prompt: "Wer findet ein Osterei und überlegt nicht, ob man es essen kann, sondern ob es zum Basteln benutzt oder irgendwo draufgenäht werden könnte?",
+          options: ["Tim", "Eli", "Opa Gerd", "Emma"],
+          answer: 3,
+          lore: "Emma, weil bei ihr selbst Ostern in Rekordzeit zu Bastelmaterial werden kann.",
+          image: "images/frage9.png",
+                    solutionImage: "images/loesung9.png"
+
+        },
+        {
+          id: 10,
+          title: "Wiesen-Ei 10",
+          prompt: "Vor wem hätte selbst der Osterhase am meisten Angst, wenn er die Eier schlecht versteckt hat?",
+          options: ["Susi", "Eli", "Phil", "Emma"],
+          answer: 0,
+          lore: "Susi, weil sie sofort merken würde, dass der Osterhase sich hier keine große Mühe gegeben hat.",
+          image: "images/frage11.png",
+                    solutionImage: "images/loesung11.png"
+
+        }
+      ],
+
+      /* =======================================================
+         POSITIONEN DER EIER AUF DER WIESE
+         Hier kannst du die Eier verschieben.
+         Du kannst top/left/right/bottom in Prozent anpassen.
+         ======================================================= */
+      eggPositions: [
+        { top: "17%", left: "11%" },
+        { top: "21%", right: "10%" },
+        { top: "35%", left: "28%" },
+        { top: "38%", right: "24%" },
+        { top: "50%", left: "12%" },
+        { top: "52%", right: "8%" },
+        { top: "62%", left: "34%" },
+        { top: "66%", right: "30%" },
+        { bottom: "11%", left: "18%" },
+        { bottom: "8%", right: "17%" }
+      ]
+    };
+
+    /* =========================================================
+       APP-STATUS
+       Diese Variablen steuern den aktuellen Spielstand.
+       ========================================================= */
+    let screen = "start";
+    let confirmedName = "";
+    let activeQuizId = null;
+    let selectedAnswerIndex = null;
+    let attempts = {};
+    let solved = {};
+    let feedback = null;
+    let leaderboard = [];
+let leaderboardOpen = false;
+    /* =========================================================
+       DOM-REFERENZEN
+       ========================================================= */
+    const hud = document.getElementById("hud");
+    const hudEggs = document.getElementById("hud-eggs");
+    const hudScore = document.getElementById("hud-score");
+
+    const screenStart = document.getElementById("screen-start");
+    const screenMap = document.getElementById("screen-map");
+    const screenQuiz = document.getElementById("screen-quiz");
+    const screenEnd = document.getElementById("screen-end");
+
+    const nameInput = document.getElementById("name-input");
+    const confirmNameBtn = document.getElementById("confirm-name-btn");
+    const welcomeName = document.getElementById("welcome-name");
+
+    const eggLayer = document.getElementById("egg-layer");
+    const leaderboardList = document.getElementById("leaderboard-list");
+    const mapCard = document.getElementById("map-card");
+const leaderboardPanel = document.getElementById("leaderboard-panel");
+const toggleLeaderboardBtn = document.getElementById("toggle-leaderboard-btn");
+const endLeaderboardList = document.getElementById("end-leaderboard-list");
+const confettiLayer = document.getElementById("confetti-layer");
+    const quizImage = document.getElementById("quiz-image");
+    const quizEggTitle = document.getElementById("quiz-egg-title");
+    const quizQuestionCount = document.getElementById("quiz-question-count");
+    const quizQuestionText = document.getElementById("quiz-question-text");
+    const attemptCounter = document.getElementById("attempt-counter");
+    const answerList = document.getElementById("answer-list");
+    const quizLoreText = document.getElementById("quiz-lore-text");
+    const loreBox = document.getElementById("lore-box");
+const loreTitle = document.getElementById("lore-title");
+const feedbackBox = document.getElementById("feedback-box");
+const submitAnswerBtn = document.getElementById("submit-answer-btn");
+const nextFromQuizBtn = document.getElementById("next-from-quiz-btn");
+const backToMapBtn = document.getElementById("back-to-map-btn");
+    const endTitle = document.getElementById("end-title");
+    const endEggs = document.getElementById("end-eggs");
+    const endScore = document.getElementById("end-score");
+    const endGreeting = document.getElementById("end-greeting");
+    const endPhoto = document.getElementById("end-photo");
+    const endPhotoPlaceholder = document.getElementById("end-photo-placeholder");
+    const restartBtn = document.getElementById("restart-btn");
+
+    /* =========================================================
+       HILFSFUNKTIONEN
+       ========================================================= */
+    function getQuestions() {
+      return APP_CONFIG.questions;
+    }
+
+    function getQuestionById(id) {
+      return getQuestions().find(q => q.id === id) || null;
+    }
+
+    function getEggsCollected() {
+      return Object.keys(solved).length;
+    }
+
+    function getScore() {
+      return Object.values(solved).reduce((sum, entry) => sum + (entry.points || 0), 0);
+    }
+
+    function showScreen(target) {
+      screen = target;
+
+      [screenStart, screenMap, screenQuiz, screenEnd].forEach(el => {
+        el.classList.remove("active");
+      });
+
+      if (target === "start") screenStart.classList.add("active");
+      if (target === "map") screenMap.classList.add("active");
+      if (target === "quiz") screenQuiz.classList.add("active");
+      if (target === "end") screenEnd.classList.add("active");
+
+      if (target === "start") {
+        hud.classList.add("hidden");
+      } else {
+        hud.classList.remove("hidden");
+      }
+    }
+
+    function updateHud() {
+      hudEggs.textContent = `${getEggsCollected()}/${APP_CONFIG.totalQuestions}`;
+      hudScore.textContent = String(getScore());
+    }
+
+    function loadLeaderboard() {
+      try {
+        const raw = localStorage.getItem(APP_CONFIG.storageKey);
+        leaderboard = raw ? JSON.parse(raw) : [];
+      } catch (error) {
+        console.error("Leaderboard konnte nicht geladen werden", error);
+        leaderboard = [];
+      }
+    }
+
+    function saveLeaderboard() {
+      try {
+        localStorage.setItem(APP_CONFIG.storageKey, JSON.stringify(leaderboard));
+      } catch (error) {
+        console.error("Leaderboard konnte nicht gespeichert werden", error);
+      }
+    }
+
+    function addLeaderboardEntry(name, scoreValue) {
+      leaderboard.push({
+        name,
+        score: scoreValue,
+        date: new Date().toISOString()
+      });
+      saveLeaderboard();
+    }
+
+function renderLeaderboardInto(container, sorted) {
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  if (sorted.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "leaderboard-item";
+    empty.textContent = "Noch keine Einträge gespeichert.";
+    container.appendChild(empty);
+    return;
+  }
+
+  sorted.forEach((entry, index) => {
+    const row = document.createElement("div");
+
+    let rowClass = "leaderboard-item";
+    let badgeClass = "rank-badge";
+
+    if (index === 0) {
+      rowClass += " rank-1";
+      badgeClass += " rank-1";
+    } else if (index === 1) {
+      rowClass += " rank-2";
+      badgeClass += " rank-2";
+    } else if (index === 2) {
+      rowClass += " rank-3";
+      badgeClass += " rank-3";
+    }
+
+    row.className = rowClass;
+
+    row.innerHTML = `
+      <div class="leaderboard-left">
+        <div class="${badgeClass}">${index + 1}</div>
+        <div class="leaderboard-name">${escapeHtml(entry.name)}</div>
+      </div>
+      <div class="leaderboard-score">${entry.score}</div>
+    `;
+
+    container.appendChild(row);
+  });
+}
+
+function renderLeaderboard() {
+  const sorted = [...leaderboard]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 12);
+
+  renderLeaderboardInto(leaderboardList, sorted);
+  renderLeaderboardInto(endLeaderboardList, sorted);
+}
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+/*richtige stelle?*/
+function updateLeaderboardPanel() {
+  if (!leaderboardPanel || !toggleLeaderboardBtn) return;
+
+  if (leaderboardOpen) {
+    leaderboardPanel.classList.remove("hidden");
+    toggleLeaderboardBtn.textContent = "Rangliste ausblenden";
+  } else {
+    leaderboardPanel.classList.add("hidden");
+    toggleLeaderboardBtn.textContent = "Rangliste anzeigen";
+  }
+}
+
+function launchConfetti(count = 50) {
+  if (!confettiLayer) return;
+
+  const colors = ["#ffd979", "#f59bb7", "#7acb86", "#84caff", "#ffffff"];
+
+  for (let i = 0; i < count; i++) {
+    const piece = document.createElement("div");
+    piece.className = "confetti-piece";
+
+    const sizeW = 6 + Math.random() * 8;
+    const sizeH = 10 + Math.random() * 12;
+    const drift = (Math.random() * 240 - 120).toFixed(0) + "px";
+    const duration = 1600 + Math.random() * 1400;
+    const delay = Math.random() * 300;
+    const left = Math.random() * 100;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+
+    piece.style.left = `${left}vw`;
+    piece.style.width = `${sizeW}px`;
+    piece.style.height = `${sizeH}px`;
+    piece.style.background = color;
+    piece.style.borderRadius = Math.random() > 0.5 ? "2px" : "999px";
+    piece.style.setProperty("--drift", drift);
+    piece.style.animationDuration = `${duration}ms`;
+    piece.style.animationDelay = `${delay}ms`;
+
+    confettiLayer.appendChild(piece);
+
+    piece.addEventListener("animationend", () => {
+      piece.remove();
+    });
+  }
+}
+
+    /* =========================================================
+       WIESEN-HINTERGRUND OPTIONAL MIT EIGENEM BILD
+       Wenn du APP_CONFIG.mapBackgroundImage setzt, wird das Bild genutzt.
+       ========================================================= */
+    function applyOptionalMapBackground() {
+      if (APP_CONFIG.mapBackgroundImage && APP_CONFIG.mapBackgroundImage.trim() !== "") {
+        mapCard.classList.add("custom-bg");
+        mapCard.style.backgroundImage = `url('${APP_CONFIG.mapBackgroundImage}')`;
+      }
+    }
+
+    /* =========================================================
+       EIER AUF DER WIESE RENDERN
+       ========================================================= */
+    function renderEggs() {
+      eggLayer.innerHTML = "";
+
+      getQuestions().forEach((question, index) => {
+        const egg = document.createElement("button");
+        egg.className = `egg${solved[question.id] ? " done" : ""}`;
+        egg.setAttribute("aria-label", question.title);
+        egg.innerHTML = "<span></span>";
+
+        const pos = APP_CONFIG.eggPositions[index] || {};
+        Object.keys(pos).forEach(key => {
+          egg.style[key] = pos[key];
+        });
+
+        if (!solved[question.id]) {
+          egg.addEventListener("click", () => openQuiz(question.id));
+        } else {
+          egg.disabled = true;
+        }
+
+        eggLayer.appendChild(egg);
+      });
+    }
+
+    /* =========================================================
+       STARTSCREEN
+       ========================================================= */
+    function confirmName() {
+      const cleanName = nameInput.value.trim();
+      if (!cleanName) return;
+
+      confirmedName = cleanName;
+      welcomeName.textContent = `Hallo, ${confirmedName}`;
+      showScreen("map");
+      updateHud();
+      renderEggs();
+      renderLeaderboard();
+    }
+
+    /* =========================================================
+       QUIZ ÖFFNEN
+       ========================================================= */
+    function openQuiz(questionId) {
+      if (solved[questionId]) return;
+
+      activeQuizId = questionId;
+      selectedAnswerIndex = null;
+      feedback = null;
+      renderQuiz();
+      showScreen("quiz");
+    }
+
+    /* =========================================================
+       FRAGEANSICHT RENDERN
+       ========================================================= */
+    function renderQuiz() {
+      const question = getQuestionById(activeQuizId);
+      if (!question) return;
+
+      const currentAttempt = attempts[question.id] || 0;
+      const isLocked = feedback && (feedback.type === "correct" || feedback.type === "revealed");
+
+      quizEggTitle.textContent = question.title;
+      quizQuestionCount.textContent = `Frage ${question.id} von ${APP_CONFIG.totalQuestions}`;
+      quizQuestionText.textContent = question.prompt;
+      attemptCounter.textContent = `Versuch ${Math.min(currentAttempt + 1, 2)} von 2`;
+if (feedback && (feedback.type === "correct" || feedback.type === "revealed")) {
+  loreBox.classList.remove("hidden");
+  loreTitle.textContent = "Auflösung";
+  quizLoreText.textContent = question.lore;
+} else {
+  loreBox.classList.add("hidden");
+  quizLoreText.textContent = "";
+}
+/* =======================================================
+   BILD ÜBER DER FRAGE / LÖSUNGSBILD
+   Vor der Antwort: normales Fragebild
+   Nach richtiger Antwort oder Auflösung: solutionImage
+   Wenn kein solutionImage gesetzt ist, bleibt das normale Bild.
+   ======================================================= */
+const showSolutionImage = feedback && (feedback.type === "correct" || feedback.type === "revealed");
+
+let currentImage = question.image;
+
+if (
+  showSolutionImage &&
+  question.solutionImage &&
+  question.solutionImage.trim() !== ""
+) {
+  currentImage = question.solutionImage;
+}
+
+quizImage.src = currentImage && currentImage.trim() !== "" ? currentImage : "";
+quizImage.style.display = currentImage && currentImage.trim() !== "" ? "block" : "none";
+      answerList.innerHTML = "";
+
+      question.options.forEach((option, index) => {
+        const btn = document.createElement("button");
+        btn.className = "answer-btn";
+        btn.textContent = option;
+
+        if (selectedAnswerIndex === index) {
+          btn.classList.add("selected");
+        }
+
+        if (isLocked && index === question.answer) {
+          btn.classList.add("correct");
+        }
+
+        if (isLocked && feedback.type === "revealed" && selectedAnswerIndex === index && index !== question.answer) {
+          btn.classList.add("wrong");
+        }
+
+        btn.disabled = isLocked;
+
+        btn.addEventListener("click", () => {
+          if (isLocked) return;
+          selectedAnswerIndex = index;
+          renderQuiz();
+        });
+
+        answerList.appendChild(btn);
+      });
+
+      renderFeedback();
+    }
+
+    function renderFeedback() {
+      feedbackBox.className = "feedback-box hidden";
+      feedbackBox.textContent = "";
+
+      submitAnswerBtn.classList.remove("hidden");
+      nextFromQuizBtn.classList.add("hidden");
+      submitAnswerBtn.disabled = selectedAnswerIndex === null;
+
+      if (!feedback) return;
+
+      feedbackBox.classList.remove("hidden");
+
+      if (feedback.type === "retry") {
+        feedbackBox.classList.add("feedback-retry");
+      }
+      if (feedback.type === "correct") {
+        feedbackBox.classList.add("feedback-correct");
+      }
+      if (feedback.type === "revealed") {
+        feedbackBox.classList.add("feedback-reveal");
+      }
+
+      feedbackBox.textContent = feedback.text;
+
+      if (feedback.type === "correct" || feedback.type === "revealed") {
+        submitAnswerBtn.classList.add("hidden");
+        nextFromQuizBtn.classList.remove("hidden");
+      }
+    }
+
+    /* =========================================================
+       ANTWORT PRÜFEN
+       LOGIK:
+       1. Versuch richtig = 10 Punkte
+       2. Versuch richtig = 5 Punkte
+       nach 2 Fehlversuchen = Auflösung, 0 Punkte
+       ========================================================= */
+    function submitAnswer() {
+      const question = getQuestionById(activeQuizId);
+      if (!question || selectedAnswerIndex === null) return;
+
+      const currentAttempt = attempts[question.id] || 0;
+      const nextAttempt = currentAttempt + 1;
+      const isCorrect = selectedAnswerIndex === question.answer;
+
+      attempts[question.id] = nextAttempt;
+
+      if (isCorrect) {
+        const points = nextAttempt === 1 ? 10 : 5;
+        solved[question.id] = {
+          points,
+          correct: true,
+          attempts: nextAttempt
+        };
+
+        feedback = {
+          type: "correct",
+          text: nextAttempt === 1
+            ? "Richtig beim ersten Versuch. Du bekommst 10 Punkte."
+            : "Richtig beim zweiten Versuch. Du bekommst 5 Punkte."
+        };
+launchConfetti(nextAttempt === 1 ? 55 : 35);
+        updateHud();
+        renderQuiz();
+        return;
+      }
+
+      if (nextAttempt >= 2) {
+        solved[question.id] = {
+          points: 0,
+          correct: false,
+          attempts: nextAttempt
+        };
+
+        feedback = {
+  type: "revealed",
+  text: `Leider nicht richtig. Die richtige Antwort ist: ${question.options[question.answer]}.`
+};
+
+        updateHud();
+        renderQuiz();
+        return;
+      }
+
+      feedback = {
+        type: "retry",
+        text: "Noch nicht richtig. Du hast noch einen zweiten Versuch."
+      };
+
+      selectedAnswerIndex = null;
+      renderQuiz();
+    }
+
+    /* =========================================================
+       ZURÜCK ZUR WIESE
+       ========================================================= */
+    function goBackToMap() {
+      activeQuizId = null;
+      selectedAnswerIndex = null;
+      feedback = null;
+      renderEggs();
+      renderLeaderboard();
+      updateHud();
+      showScreen("map");
+
+      if (getEggsCollected() === APP_CONFIG.totalQuestions) {
+        finishGame();
+      }
+    }
+
+    /* =========================================================
+       SPIEL ABSCHLIESSEN
+       ========================================================= */
+    function finishGame() {
+      addLeaderboardEntry(confirmedName, getScore());
+      renderLeaderboard();
+launchConfetti(140);
+      endTitle.textContent = `Frohe Ostern, ${confirmedName}`;
+      endEggs.textContent = `${APP_CONFIG.totalQuestions}/${APP_CONFIG.totalQuestions}`;
+      endScore.textContent = String(getScore());
+      endGreeting.textContent = APP_CONFIG.endGreeting;
+
+      /* =======================================================
+         FAMILIENFOTO AUF DER ABSCHLUSSSEITE
+         ======================================================= */
+      if (APP_CONFIG.endPhoto && APP_CONFIG.endPhoto.trim() !== "") {
+        endPhoto.src = APP_CONFIG.endPhoto;
+        endPhoto.classList.remove("hidden");
+        endPhotoPlaceholder.classList.add("hidden");
+      } else {
+        endPhoto.classList.add("hidden");
+        endPhotoPlaceholder.classList.remove("hidden");
+      }
+
+      showScreen("end");
+    }
+
+    /* =========================================================
+       NOCHMAL SPIELEN
+       Achtung: Die Rangliste bleibt erhalten.
+       Nur die aktuelle Runde wird zurückgesetzt.
+       ========================================================= */
+    function restartGame() {
+      activeQuizId = null;
+      selectedAnswerIndex = null;
+      attempts = {};
+      solved = {};
+      feedback = null;
+      updateHud();
+      renderEggs();
+      renderLeaderboard();
+      showScreen("map");
+    }
+
+    /* =========================================================
+       EVENTS
+       ========================================================= */
+    confirmNameBtn.addEventListener("click", confirmName);
+
+    nameInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        confirmName();
+      }
+    });
+
+    submitAnswerBtn.addEventListener("click", submitAnswer);
+    nextFromQuizBtn.addEventListener("click", goBackToMap);
+    backToMapBtn.addEventListener("click", goBackToMap);
+    restartBtn.addEventListener("click", restartGame);
+toggleLeaderboardBtn.addEventListener("click", () => {
+  leaderboardOpen = !leaderboardOpen;
+  updateLeaderboardPanel();
+});
+    /* =========================================================
+       INITIALISIERUNG
+       ========================================================= */
+    function init() {
+  loadLeaderboard();
+  renderLeaderboard();
+  updateHud();
+  applyOptionalMapBackground();
+  endGreeting.textContent = APP_CONFIG.endGreeting;
+  updateLeaderboardPanel();
+}
+
+    init();
+  </script>
+</body>
+</html>
